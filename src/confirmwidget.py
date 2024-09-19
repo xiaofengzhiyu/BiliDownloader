@@ -138,6 +138,25 @@ class LaodInfoAV(LoadInfoBase):
             "title": data["title"],
             "page_data": page_data
         }
+        if("ugc_season" in data.keys()):
+            ugc_season_title = data["ugc_season"]["title"]
+            i = 0
+            for section in data["ugc_season"]["sections"]:
+                for episode in section["episodes"]:
+                    part = {
+                        "isbvid": True,
+                        "id": episode["bvid"],
+                        "cid": episode["cid"],
+                        "page": i + 1,
+                        "name": ugc_season_title,
+                        "title": episode["title"],
+                        "type": "video",
+                    }
+                    page_data.append(part)    
+            meta_data ={
+                "title": ugc_season_title,
+                "page_data": page_data
+            }
         pack = pickle.dumps(meta_data)
         pack = QByteArray(pack)
         self.emit(SIGNAL("update_meta(QByteArray)"), pack)
@@ -177,6 +196,25 @@ class LoadInfoBV(LoadInfoBase):
             "title": data["title"],
             "page_data": page_data
         }
+        if("ugc_season" in data.keys()):
+            ugc_season_title = data["ugc_season"]["title"]
+            i = 0
+            for section in data["ugc_season"]["sections"]:
+                for episode in section["episodes"]:
+                    part = {
+                        "isbvid": True,
+                        "id": episode["bvid"],
+                        "cid": episode["cid"],
+                        "page": i + 1,
+                        "name": ugc_season_title,
+                        "title": episode["title"],
+                        "type": "video",
+                    }
+                    page_data.append(part)    
+            meta_data ={
+                "title": ugc_season_title,
+                "page_data": page_data
+            }
         pack = pickle.dumps(meta_data)
         pack = QByteArray(pack)
         self.emit(SIGNAL("update_meta(QByteArray)"), pack)
