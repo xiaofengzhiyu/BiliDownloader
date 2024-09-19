@@ -147,11 +147,12 @@ class LaodInfoAV(LoadInfoBase):
                         "isbvid": True,
                         "id": episode["bvid"],
                         "cid": episode["cid"],
-                        "page": i + 1,
-                        "name": ugc_season_title,
-                        "title": episode["title"],
+                        "page": i,
+                        "name": episode["title"],
+                        "title": ugc_season_title,
                         "type": "video",
                     }
+                    i += 1
                     page_data.append(part)    
             meta_data ={
                 "title": ugc_season_title,
@@ -205,11 +206,12 @@ class LoadInfoBV(LoadInfoBase):
                         "isbvid": True,
                         "id": episode["bvid"],
                         "cid": episode["cid"],
-                        "page": i + 1,
-                        "name": ugc_season_title,
-                        "title": episode["title"],
+                        "page": i,
+                        "name": episode["title"],
+                        "title": ugc_season_title,
                         "type": "video",
                     }
+                    i += 1
                     page_data.append(part)    
             meta_data ={
                 "title": ugc_season_title,
