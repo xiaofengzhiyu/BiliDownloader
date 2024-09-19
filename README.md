@@ -45,3 +45,9 @@
 ## 其他
 
 Windows可执行文件通过Nuitka构建
+
+
+## Modify
+remove update
+add suport for ugc_season videos download
+
