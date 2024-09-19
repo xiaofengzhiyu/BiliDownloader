@@ -7,7 +7,6 @@ from checkaccount import CheckAccountThread
 from dialogchangelog import show_changelog
 from dialogdownloadupdate import DialogDownloadUpdate
 from dialogupdateinfo import DialogUpdateInfo
-from update import UpdateChecker, UpdateDownloader
 from utils import init, configUtils
 
 
@@ -43,20 +42,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.on_tab_changes,
         )
 
-        # Check Update
-        self.update_thread = UpdateChecker(self)
-        self.connect(
-            self.update_thread,
-            QtCore.SIGNAL("finished()"),
-            self.update_finish,
-        )
-        self.connect(
-            self.update_thread,
-            QtCore.SIGNAL("find_update(QString, QString)"),
-            self.find_update,
-        )
-        self.update_thread.start()
-
         # Check Account
         self.check_account_thread = CheckAccountThread(self)
         self.connect(
@@ -65,46 +50,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.check_account_finished
         )
         self.check_account_thread.start()
-
-    # Slot
-    def find_update(self, new: str, info: str):
-        self.ui.centralwidget.setEnabled(False)
-        dialog = DialogUpdateInfo(new, info, self)
-        resault = dialog.exec()
-        if resault == QtWidgets.QDialog.DialogCode.Rejected:
-            self.ui.centralwidget.setEnabled(True)
-            return
-        dialog = DialogDownloadUpdate(self)
-        self.download_thread = UpdateDownloader(self)
-        self.download_path = configUtils.getUserData(
-            "downloadPath", QtCore.QDir("Download").absolutePath()
-        )
-        self.download_thread.setup(self.download_path)
-        self.download_thread.connect(
-            self.download_thread,
-            QtCore.SIGNAL("update_process(int, int)"),
-            dialog,
-            QtCore.SLOT("update_process(int, int)"),
-        )
-        self.download_thread.connect(
-            self.download_thread,
-            QtCore.SIGNAL("download_err(QString)"),
-            self,
-            QtCore.SLOT("download_err(QString)"),
-        )
-        self.download_thread.connect(
-            self.download_thread,
-            QtCore.SIGNAL("downlaod_install(QString)"),
-            self,
-            QtCore.SLOT("downlaod_install(QString)"),
-        )
-        self.download_thread.start()
-        dialog.exec()
-
-    # Slot
-    def update_finish(self):
-        self.disconnect(self.update_thread)
-        del self.update_thread
 
     # Slot
     def check_account_finished(self, res):
