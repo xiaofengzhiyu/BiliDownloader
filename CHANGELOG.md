@@ -1,4 +1,8 @@
 # BiliDownloader
+- 1.3.2 
+ - 添加对合集的支持
+ - 删除一些不需要的功能(update)
+
 
 ### Copyright © 2021-2024 Majjcom
 

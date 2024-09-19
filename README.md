@@ -12,6 +12,8 @@
 
 输入BV号、AV号、MD号或EP号即可获取视频 (MD号是指番剧详情页面链接上的**mdxxxx**)
 
+同时支持AV/BV 页面的视频合集的下载
+
 ------
 
 你可以在**设置界面**设置<u>下载位置</u>
@@ -45,9 +47,3 @@
 ## 其他
 
 Windows可执行文件通过Nuitka构建
-
-
-## Modify
-remove update
-add suport for ugc_season videos download
-

@@ -115,3 +115,21 @@ dmypy.json
 .pyre/
 
 /src/Lib/bd_client/const.py
+
+
+# vscode
+*.code-workspace
+ffmpeg.7z
+src/ffmpeg/
+
+
+*.ui
+ui_*.py
+res_rc.py
+*.cache
+main.dist/
+main.onefile-build/
+nuitka.cmd
+.gitignore
+starter/
+BiliDown.zip
