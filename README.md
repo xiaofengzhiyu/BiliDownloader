@@ -1,10 +1,14 @@
 # BiliDownloader
 
-[![tag](https://img.shields.io/badge/Homepage-Majjcom-blue.svg)](http://www.majjcom.site/) ![tag](https://img.shields.io/badge/Language-Python3,_C++-orange.svg) ![tag](https://img.shields.io/badge/License-MIT-green.svg)
+![tag](https://img.shields.io/badge/Language-Python3,_C++-orange.svg) ![tag](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## 介绍
 
 这是一款开源的 b 站 视频下载器
+
+原仓库在  [Majjcom/BiliDownloader](https://github.com/Majjcom/BiliDownloader)
+
+自用版本 , 添加了对 AV/BV 页面的视频合集下载的支持
 
 ## 使用
 
