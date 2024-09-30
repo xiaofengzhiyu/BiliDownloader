@@ -9,8 +9,8 @@ from PySide6 import QtCore
 from Lib.bili_api import video, danmaku, bangumi, subtitle
 from Lib.bili_api.utils import BiliPassport
 from Lib.xml2ass import convertMain
-from src.Lib.bili_api.subtitle import get_subtitle_url, download_subtitle_url
-from src.Lib.json2srt import json2srt
+from Lib.bili_api.subtitle import get_subtitle_url, download_subtitle_url
+from Lib.json2srt import json2srt
 from utils import configUtils
 
 _DEFAULT_HEADERS = {
