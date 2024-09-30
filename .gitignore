@@ -133,3 +133,6 @@ nuitka.cmd
 .gitignore
 starter/
 BiliDown.zip
+main.build/
+src/nuitka_config/
+download/
