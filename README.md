@@ -1,3 +1,7 @@
+- [x] 添加对合集视频的下载支持
+- [x] 添加对字幕的下载支持
+      
+
 # BiliDownloader
 
 ![tag](https://img.shields.io/badge/Language-Python3,_C++-orange.svg) ![tag](https://img.shields.io/badge/License-MIT-green.svg)
