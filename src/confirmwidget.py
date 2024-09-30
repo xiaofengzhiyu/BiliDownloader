@@ -14,6 +14,7 @@ from utils import configUtils
 class ConfirmWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(ConfirmWidget, self).__init__(parent)
+        self.load_thread: QtCore.QThread = None
         self.ui = Ui_ConfirmWidget()
         self.ui.setupUi(self)
         self.err = True
@@ -62,8 +63,9 @@ class ConfirmWidget(QtWidgets.QWidget):
         self.ui.cover_label.setPixmap(QtGui.QPixmap.fromImage(img))
         self.ui.text_info.setText("")
         self.ui.button_next.setDisabled(True)
-        fmt, content = self.parent().input_pages[0].get_content()
-        self.load_thread = load_map[fmt](self, content)
+        input_widget= self.parent().input_pages[0]
+        fmt, content = input_widget.get_content()
+        self.load_thread: QtCore.QThread = load_map[fmt](self, content)
         self.connect(
             self.load_thread,
             SIGNAL("update_info(QString, bool)"),
@@ -88,7 +90,7 @@ class LoadInfoBase(QtCore.QThread):
         super(LoadInfoBase, self).__init__(parent)
         self.format = fmt
         self.content = content
-        self.update_imgae = Signal(QtGui.QImage, name="update_imgae")
+        self.update_image = Signal(QtGui.QImage, name="update_image")
         self.update_info = Signal(str, bool, name="update_info")
         self.update_meta = Signal(QByteArray, name="update_meta")
 
@@ -127,6 +129,8 @@ class LaodInfoAV(LoadInfoBase):
             part = {
                 "isbvid": self.format == "BV",
                 "id": self.content[2:],
+                "aid": data["aid"],
+                "bid": data["bvid"],
                 "cid": i["cid"],
                 "page": i["page"],
                 "name": i["part"],
@@ -146,6 +150,8 @@ class LaodInfoAV(LoadInfoBase):
                     part = {
                         "isbvid": True,
                         "id": episode["bvid"],
+                        "aid": data["aid"],
+                        "bid": data["bvid"],
                         "cid": episode["cid"],
                         "page": i,
                         "name": episode["title"],
@@ -186,6 +192,8 @@ class LoadInfoBV(LoadInfoBase):
             part = {
                 "isbvid": self.format == "BV",
                 "id": self.content,
+                "aid": data["aid"],
+                "bid": data["bvid"],
                 "cid": i["cid"],
                 "page": i["page"],
                 "name": i["part"],
@@ -205,6 +213,8 @@ class LoadInfoBV(LoadInfoBase):
                     part = {
                         "isbvid": True,
                         "id": episode["bvid"],
+                        "aid": data["aid"],
+                        "bid": data["bvid"],
                         "cid": episode["cid"],
                         "page": i,
                         "name": episode["title"],
@@ -249,6 +259,8 @@ class LoadInfoMD(LoadInfoBase):
             part = {
                 "isbvid": True,
                 "id": v["bvid"],
+                "aid": data["aid"],
+                "bid": data["bvid"],
                 "cid": v["cid"],
                 "page": i + 1,
                 "name": v["title"] + "-" + v["long_title"],
@@ -291,6 +303,8 @@ class LoadInfoEP(LoadInfoBase):
             part = {
                 "isbvid": True,
                 "id": v["bvid"],
+                "aid": data["aid"],
+                "bid": data["bvid"],
                 "cid": v["cid"],
                 "page": i + 1,
                 "name": v["title"] + "-" + v["long_title"],

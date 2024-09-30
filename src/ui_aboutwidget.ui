@@ -59,14 +59,14 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Copyright (C) 2021-2024 Majjcom</string>
+      <string>Copyright (C) 2021-2024 Majjcom/Xiaofengzhiyu</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="Line" name="line">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -98,7 +98,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/Majjcom/BiliDownloader&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Majjcom/BiliDownloader&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
-        <enum>Qt::AutoText</enum>
+        <enum>Qt::TextFormat::AutoText</enum>
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
@@ -112,7 +112,7 @@
      <item>
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>Gitee:</string>
+        <string>Github:</string>
        </property>
       </widget>
      </item>
@@ -125,7 +125,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://gitee.com/majjcom/bili-downloader&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Majjcom/BiliDownloader&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/xiaofengzhiyu/BiliDownloader&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#00007f;&quot;&gt;xiaofengzhiyu/BiliDownloader&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
@@ -137,7 +137,7 @@
    <item>
     <widget class="Line" name="line_2">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -160,7 +160,7 @@
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -175,7 +175,7 @@
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>

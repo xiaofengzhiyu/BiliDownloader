@@ -15,10 +15,12 @@ SELECTTON_HELP = """输入你要下载的区段：
 
 
 class SelectionWidget(QtWidgets.QWidget):
-    def __init__(self, parent: QtWidgets.QWidget | None = ...) -> None:
+    def __init__(self, parent: QtWidgets.QWidget | None, name:str | None =...) -> None:
         super().__init__(parent)
         self.ui = Ui_SelectionWidget()
         self.ui.setupUi(self)
+        self.name = name
+        self.ui.label.setText("选择==> " + self.name)
         self.meta = None
         self.data = None
         self.connect(
@@ -33,39 +35,39 @@ class SelectionWidget(QtWidgets.QWidget):
         )
 
     def data_update(self, back):
-        if back:
-            return
-        self.ui.table_selection.setRowCount(0)
-        self.ui.button_next.setEnabled(True)
-        self.meta: QtCore.QByteArray = self.parent().input_pages[1].meta
-        self.data = pickle.loads(self.meta.data())
+        if not back:
+            self.ui.table_selection.setRowCount(0)
+            self.ui.button_next.setEnabled(True)
+            self.meta: QtCore.QByteArray = self.parent().input_pages[1].meta
+            self.data = pickle.loads(self.meta.data())
         for i in self.data["page_data"]:
+            if 'box' in i.keys():
+                break
             box = CentralCheckBox()
             box.get_box().setChecked(True)
             i["box"] = box
-            self.connect(
-                box.get_box(),
-                QtCore.SIGNAL("toggled(bool)"),
-                self.on_check_button_changed
-            )
+            # self.connect(
+            #     box.get_box(),
+            #     QtCore.SIGNAL("toggled(bool)"),
+            #     self.on_check_button_changed
+            # )
             item_text = QtWidgets.QTableWidgetItem(i["name"])
             self.ui.table_selection.setRowCount(self.ui.table_selection.rowCount() + 1)
             self.ui.table_selection.setCellWidget(
-                self.ui.table_selection.rowCount() - 1, 0, box
+                self.ui.table_selection.rowCount() - 1, 0, i['box']
             )
             self.ui.table_selection.setItem(
                 self.ui.table_selection.rowCount() - 1, 1, item_text
             )
-
-    # Slot
-    def on_check_button_changed(self, _checked: bool):
-        count = 0
-        for i in self.data["page_data"]:
-            box = i["box"]
-            box = box.get_box()
-            if box.isChecked():
-                count += 1
-        self.ui.button_next.setEnabled(count > 0)
+    # # Slot 判断是否能够点继续按钮
+    # def on_check_button_changed(self, _checked: bool):
+    #     count = 0
+    #     for i in self.data["page_data"]:
+    #         box = i["box"]
+    #         box = box.get_box()
+    #         if box.isChecked():
+    #             count += 1
+    #     self.ui.button_next.setEnabled(count > 0)
 
     # Slot
     def on_help_button_clicked(self):

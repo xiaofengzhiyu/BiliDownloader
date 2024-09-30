@@ -6,9 +6,11 @@ from urllib.request import Request, urlopen
 
 from PySide6 import QtCore
 
-from Lib.bili_api import video, danmaku, bangumi
+from Lib.bili_api import video, danmaku, bangumi, subtitle
 from Lib.bili_api.utils import BiliPassport
 from Lib.xml2ass import convertMain
+from src.Lib.bili_api.subtitle import get_subtitle_url, download_subtitle_url
+from src.Lib.json2srt import json2srt
 from utils import configUtils
 
 _DEFAULT_HEADERS = {
@@ -22,6 +24,34 @@ def download_danmaku(path, cid):
     danmakuAss = convertMain(danmakuXml, 852, 480, text_opacity=0.6)
     with open(path, "w", encoding="utf_8") as f:
         f.write(danmakuAss)
+
+
+def do_download_subtitle(path, aid, cid, passport):
+    subtitle_data = get_subtitle_url(aid, cid, passport)
+    sub_zh = ""
+    sub_en = ""
+    if len(subtitle_data['subtitle']["subtitles"]) > 0:
+        for sub in subtitle_data['subtitle']['subtitles']:
+            language = sub['lan']
+            subtitle_url = sub['subtitle_url']
+            if language == "zh-CN":
+                sub_zh = subtitle_url
+            elif language == "ai-zh" and sub_zh == "":
+                sub_zh = subtitle_url
+            if language == "en-US":
+                sub_en = subtitle_url
+            elif language == "ai-en" and sub_en == "":
+                sub_en = subtitle_url
+        if sub_zh != "":
+            zh = download_subtitle_url(sub_zh)
+            if zh:
+                with open(path.replace('.srt', '.zh-CN.srt'), "w", encoding="utf_8") as f:
+                    f.write(json2srt(zh))
+        if sub_en != "":
+            en = download_subtitle_url(sub_en)
+            if en:
+                with open(path.replace('.srt', '.en-US.srt'), "w", encoding="utf_8") as f:
+                    f.write(json2srt(en))
 
 
 class DownloadTask(QtCore.QThread):
@@ -299,6 +329,21 @@ class DownloadTask(QtCore.QThread):
                 root_dir.remove(danmaku_file_name)
             time.sleep(1)
 
+    def download_subtitle(self, root_dir: QtCore.QDir, passport):
+        subtitles_file_name = "{}.srt".format(self.task["name"])
+        try:
+            self.emit(QtCore.SIGNAL("update_status(QString)"), "正在下载字幕")
+            do_download_subtitle(
+                root_dir.absoluteFilePath(subtitles_file_name), self.task["aid"], self.task["cid"], passport
+            )
+        except Exception as _:
+            self.emit(QtCore.SIGNAL("update_status(QString)"), "下载字幕失败或字幕不存在，已跳过")
+            if root_dir.exists(subtitles_file_name):
+                root_dir.remove(subtitles_file_name)
+            time.sleep(1)
+
+        pass
+
     def run(self):
         self.emit(QtCore.SIGNAL("update_status(QString)"), "开始下载")
 
@@ -317,77 +362,82 @@ class DownloadTask(QtCore.QThread):
             passport = BiliPassport(passportRaw)
 
         # Get Urls
-        try_times = 0
-        while try_times < 3:
-            try:
-                self.emit(QtCore.SIGNAL("update_status(QString)"), "正在获取链接")
-                get_url = None
-                if self.task["type"] == "video":
-                    if self.task["isbvid"]:
-                        get_url = video.get_video_url(
-                            bvid=self.task["id"], cid=self.task["cid"], fnval=self.task["fnval"], passport=passport
-                        )
-                    else:
-                        get_url = video.get_video_url(
-                            avid=self.task["id"], cid=self.task["cid"], fnval=self.task["fnval"], passport=passport
-                        )
-                elif self.task["type"] == "bangumi":
-                    if self.task["isbvid"]:
-                        get_url = bangumi.get_bangumi_url(
-                            bvid=self.task["id"],
-                            cid=self.task["cid"],
-                            fnval=self.task["fnval"],
-                            passport=passport,
-                        )["video_info"]
-                    else:
-                        get_url = bangumi.get_bangumi_url(
-                            avid=self.task["id"],
-                            cid=self.task["cid"],
-                            fnval=self.task["fnval"],
-                            passport=passport,
-                        )["video_info"]
-                break
-            except Exception as _e:
-                try_times += 1
-                self.emit(
-                    QtCore.SIGNAL("update_status(QString)"),
-                    "获取链接失败，即将重试，次数{}".format(try_times),
-                )
-                if try_times >= 3 and self.task["type"] == "video":
+        if self.task["saveVideo"]:
+            try_times = 0
+            while try_times < 3:
+                try:
+                    self.emit(QtCore.SIGNAL("update_status(QString)"), "正在获取链接")
+                    get_url = None
+                    if self.task["type"] == "video":
+                        if self.task["isbvid"]:
+                            get_url = video.get_video_url(
+                                bvid=self.task["id"], cid=self.task["cid"], fnval=self.task["fnval"], passport=passport
+                            )
+                        else:
+                            get_url = video.get_video_url(
+                                avid=self.task["id"], cid=self.task["cid"], fnval=self.task["fnval"], passport=passport
+                            )
+                    elif self.task["type"] == "bangumi":
+                        if self.task["isbvid"]:
+                            get_url = bangumi.get_bangumi_url(
+                                bvid=self.task["id"],
+                                cid=self.task["cid"],
+                                fnval=self.task["fnval"],
+                                passport=passport,
+                            )["video_info"]
+                        else:
+                            get_url = bangumi.get_bangumi_url(
+                                avid=self.task["id"],
+                                cid=self.task["cid"],
+                                fnval=self.task["fnval"],
+                                passport=passport,
+                            )["video_info"]
+                    break
+                except Exception as _e:
+                    try_times += 1
                     self.emit(
                         QtCore.SIGNAL("update_status(QString)"),
-                        "失败次数过多，尝试更换获取链接方式"
+                        "获取链接失败，即将重试，次数{}".format(try_times),
                     )
-                    time.sleep(1.0)
-                    self.task["type"] = "bangumi"
-                    try_times = 0
-                time.sleep(2)
-        else:
-            self.emit(QtCore.SIGNAL("update_status(QString)"), "下载失败，请重新输入")
-            self.task["finished"] = True
-            return
+                    if try_times >= 3 and self.task["type"] == "video":
+                        self.emit(
+                            QtCore.SIGNAL("update_status(QString)"),
+                            "失败次数过多，尝试更换获取链接方式"
+                        )
+                        time.sleep(1.0)
+                        self.task["type"] = "bangumi"
+                        try_times = 0
+                    time.sleep(2)
+            else:
+                self.emit(QtCore.SIGNAL("update_status(QString)"), "下载失败，请重新输入")
+                self.task["finished"] = True
+                return
 
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(100)
-        self.timer.timeout.connect(self.timer_timeout)
-        self.timer_stopped = False
-        self.timer.start()
-        self.timer.moveToThread(self.thread())
+            self.timer = QtCore.QTimer()
+            self.timer.setInterval(100)
+            self.timer.timeout.connect(self.timer_timeout)
+            self.timer_stopped = False
+            self.timer.start()
+            self.timer.moveToThread(self.thread())
 
-        # parse urls
-        if self.task["type"] == "video":
-            self.download_dash(get_url, root_dir)
-        elif self.task["type"] == "bangumi":
-            if get_url["type"] == "DASH":
+            # parse urls
+            if self.task["type"] == "video":
                 self.download_dash(get_url, root_dir)
-            elif get_url["type"] == "MP4":
-                self.download_mp4(get_url, root_dir)
+            elif self.task["type"] == "bangumi":
+                if get_url["type"] == "DASH":
+                    self.download_dash(get_url, root_dir)
+                elif get_url["type"] == "MP4":
+                    self.download_mp4(get_url, root_dir)
 
         if self.fource_stop:
             return
 
+        # Download and parse subtitles
+        if self.task["saveSubtitle"]:
+            self.download_subtitle(root_dir, passport)
+
         # Download and parse Xml Danmaku
-        if self.task["saveDanmaku"]:
+        if self.task["saveDanmu"]:
             self.download_danmaku(root_dir)
 
         time.sleep(0.2)

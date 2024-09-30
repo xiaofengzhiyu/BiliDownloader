@@ -35,7 +35,7 @@ class InputWidget(QWidget):
         self.input_pages: List[QWidget] = []
         self.current_input_page = 0
 
-        # page 1
+        # page 1 load BV
         widget = InputSetupWidget(self)
         self.input_pages.append(widget)
         self.ui.gridLayout.addWidget(self.input_pages[0], 0, 0, 1, 1)
@@ -45,7 +45,7 @@ class InputWidget(QWidget):
             self.on_next_button_clicked,
         )
 
-        # page 2
+        # page 2 load confirm
         widget = ConfirmWidget(self)
         widget.setHidden(True)
         self.input_pages.append(widget)
@@ -60,8 +60,8 @@ class InputWidget(QWidget):
             self.on_back_button_clicked,
         )
 
-        # page 3
-        widget = SelectionWidget(self)
+        # page 3 load selection
+        widget = SelectionWidget(self,name="Video")
         widget.setHidden(True)
         self.input_pages.append(widget)
         self.connect(
@@ -75,7 +75,37 @@ class InputWidget(QWidget):
             self.on_back_button_clicked,
         )
 
-        # page 4
+        # page 4 selection for subtitle
+        widget = SelectionWidget(self , name="Subtitle")
+        widget.setHidden(True)
+        self.input_pages.append(widget)
+        self.connect(
+            widget.ui.button_next,
+            SIGNAL("clicked()"),
+            self.on_next_button_clicked,
+        )
+        self.connect(
+            widget.ui.button_back,
+            SIGNAL("clicked()"),
+            self.on_back_button_clicked,
+        )
+
+        # page 5 selection for danmu
+        widget = SelectionWidget(self, name="Danmu")
+        widget.setHidden(True)
+        self.input_pages.append(widget)
+        self.connect(
+            widget.ui.button_next,
+            SIGNAL("clicked()"),
+            self.on_next_button_clicked,
+        )
+        self.connect(
+            widget.ui.button_back,
+            SIGNAL("clicked()"),
+            self.on_back_button_clicked,
+        )
+
+        # page 6 final check config
         widget = ConfigWidget(self)
         widget.setHidden(True)
         self.input_pages.append(widget)

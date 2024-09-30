@@ -82,7 +82,9 @@ class ConfigWidget(QtWidgets.QWidget):
         # reserveAudio = configUtils.getUserData(configUtils.Configs.RESERVE_AUDIO, False)
         reserveAudio = userdata.get(userdata.CONFIGS.RESERVE_AUDIO, False)
         for i in self.data["download_data"]:
-            box_danmaku: CentralCheckBox = i["box_danmaku"]
+            video_checkbox: CentralCheckBox = i["video_checkbox"]
+            subtitle_checkbox: CentralCheckBox = i["subtitle_checkbox"]
+            danmu_checkbox: CentralCheckBox = i["danmu_checkbox"]
             push = {
                 "path": self.ui.line_path.text(),
                 "quality": quality,
@@ -91,9 +93,13 @@ class ConfigWidget(QtWidgets.QWidget):
                 "title": removeSpecialChars(i["title"]),
                 "id": i["id"],
                 "isbvid": i["isbvid"],
+                "bid": i["bid"],
+                "aid": i["aid"],
                 "cid": i["cid"],
                 "reserveAudio": reserveAudio,
-                "saveDanmaku": box_danmaku.get_box().isChecked(),
+                "saveVideo": video_checkbox.get_box().isChecked(),
+                "saveSubtitle": subtitle_checkbox.get_box().isChecked(),
+                "saveDanmu": danmu_checkbox.get_box().isChecked(),
                 "fnval": self.fnval,
                 "type": i["type"],
             }
@@ -139,7 +145,6 @@ class ConfigWidget(QtWidgets.QWidget):
         codec = userdata.get(userdata.CONFIGS.VIDEO_CODEC, 7)
         self.fnval = get_fnval(userdata.get(userdata.CONFIGS.ULTRA_RESOLUTION, False))
         self.ui.combo_codec.setCurrentText(video_codec_id[codec])
-        self.data = self.parent().input_pages[2].data
         self.ui.line_path.setText(
             userdata.get(
                 userdata.CONFIGS.DOWNLOAD_PATH,  # User
@@ -148,20 +153,46 @@ class ConfigWidget(QtWidgets.QWidget):
         )
         download_danmaku = userdata.get(userdata.CONFIGS.SAVE_DANMAKU, False)
         # download_danmaku = configUtils.getUserData(configUtils.Configs.SAVE_DANMAKU, False)
+        
+        # 组装需要的data
+        data_video = self.parent().input_pages[2].data
+        data_subtitle = self.parent().input_pages[3].data
+        data_danmu = self.parent().input_pages[4].data
+
+        self.data = self.parent().input_pages[2].data
+
         self.data["download_data"] = []
-        for i in self.data["page_data"]:
-            if not i["box"].get_box().isChecked():
+        for i in range(len(data_video["page_data"])):
+            data = data_video["page_data"][i]
+            data["video_name"] = data_video["page_data"][i]["name"]
+            data["video_checkbox"] = data_video["page_data"][i]["box"]
+            data["subtitle_checkbox"] = data_subtitle["page_data"][i]["box"]
+            data["danmu_checkbox"] = data_danmu["page_data"][i]["box"]
+            if not data["video_checkbox"].get_box().isChecked() and \
+                not data["subtitle_checkbox"].get_box().isChecked() and \
+                not data["danmu_checkbox"].get_box().isChecked():
                 continue
+
             self.ui.table_downloads.setRowCount(self.ui.table_downloads.rowCount() + 1)
-            i["box_danmaku"] = CentralCheckBox()
-            i["box_danmaku"].get_box().setChecked(download_danmaku)
+
             self.ui.table_downloads.setCellWidget(
-                self.ui.table_downloads.rowCount() - 1, 0, i["box_danmaku"]
+                self.ui.table_downloads.rowCount() - 1, 0, data["video_checkbox"]
+            )
+            self.ui.table_downloads.setCellWidget(
+                self.ui.table_downloads.rowCount() - 1, 1, data["subtitle_checkbox"]
+            )
+            self.ui.table_downloads.setCellWidget(
+                self.ui.table_downloads.rowCount() - 1, 2, data["danmu_checkbox"]
             )
             self.ui.table_downloads.setItem(
-                self.ui.table_downloads.rowCount() - 1, 1, QTableWidgetItem(i["name"])
+                self.ui.table_downloads.rowCount() - 1, 3, QTableWidgetItem(data["video_name"])
             )
-            self.data["download_data"].append(i)
+            self.data["download_data"].append(data)
+
+        # self.ui.widget.setEnabled(True)
+        # self.ui.button_submit.setEnabled(True)
+        # self.on_path_changed(self.ui.line_path.text())
+        
         page = self.data["page_data"][0]
         self.load_thread = GetVideoInfo(page["id"], page["isbvid"], page["cid"], self.fnval, page["type"], self)
         self.connect(
