@@ -1,0 +1,21 @@
+// yt_dlp/extractor/bilibili.py
+{
+  "subtile": {
+    "url": "https://api.bilibili.com/x/player/wbi/v2",
+    "method": "GET",
+    "verify": true,
+    "params": {
+      "aid": "num",
+      "cid": "string"
+    },
+    "return": {
+      "code": {
+        "0": "成功",
+        "-400": "请求错误,内容过期"
+      },
+      "message": "错误信息",
+      "ttl": 1,
+      "data": {}
+    }
+  }
+}
