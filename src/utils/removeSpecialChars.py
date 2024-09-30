@@ -1,4 +1,4 @@
-_TITLE_SIZE_LIMIT = 20
+_TITLE_SIZE_LIMIT = 100
 
 
 def removeSpecialChars(original: str):
